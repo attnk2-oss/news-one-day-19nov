@@ -127,6 +127,9 @@ def copy_atomically(source, destination):
 def publish(argv):
     destination = argv[1] if len(argv) > 1 else FALLBACK
     source = os.path.join(os.path.dirname(os.path.abspath(__file__)), SOURCE)
+    if os.path.abspath(source) == os.path.abspath(destination):
+        print("failed: the destination is the picture itself", file=sys.stderr)
+        return 1
     try:
         with open(source, "rb") as handle:
             blob = handle.read()
@@ -141,6 +144,7 @@ def publish(argv):
         print("weight   %d bytes, cap %d" % (len(blob), MAX_BYTES))
         print("written  %s" % destination)
         print("sha256   %s" % digest_of(destination))
+        print("verdict  one whole PNG, copied byte for byte, inside every limit")
         return 0
     except (OSError, Refused) as problem:
         print("failed: %s" % problem, file=sys.stderr)
